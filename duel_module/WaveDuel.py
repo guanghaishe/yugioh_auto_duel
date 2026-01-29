@@ -40,9 +40,27 @@ class WaveDuel(BaseDuel):
             self.runtime_context.duel_success_flag = False
             return
 
-        ClickUtils.click_by_location(self.runtime_context.duel_loc)
-        time.sleep(2)
-        CommonUtils.click_retry()
+        # 获取所有可能的决斗按钮位置并依次点击
+        duel_logo_locs = DuelUtils.get_all_duel_logo_locs()
+        entered = False
+        for loc in duel_logo_locs:
+            print(f"尝试点击决斗标签位置: {loc}")
+            ClickUtils.click_by_location(loc)
+            time.sleep(2)
+            CommonUtils.click_retry()
+            # 点击后检查决斗标签是否消失
+            if DuelUtils.get_duel_logo_loc() is None:
+                self.runtime_context.duel_loc = loc
+                entered = True
+                print("成功进入决斗")
+                break
+
+        if not entered:
+            print("未能进入决斗")
+            self.runtime_context.duel_success_flag = False
+            return
+
+        self.runtime_context.duel_success_flag = True
 
         while ClickUtils.get_img_location(WaveDuelConstants.change_role_img) is not None:
             ClickUtils.click_by_img(CommonConstants.confirm_img)

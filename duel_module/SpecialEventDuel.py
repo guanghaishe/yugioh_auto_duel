@@ -23,28 +23,49 @@ class SpecialEventDuel(BaseDuel):
 
     def before_duel(self):
         # 如果还有出现图标，继续点击
-        if ClickUtils.get_img_location(SpecialEventConstants.appear_img) is not None:
+        while ClickUtils.get_img_location(SpecialEventConstants.appear_img) is not None:
             ClickUtils.click_by_img(SpecialEventConstants.appear_img)
             print("点击出现")
             CommonUtils.click_retry()
 
         for file in EventUtils.get_event_logo_list():
-            if ClickUtils.get_img_location(SpecialEventConstants.event_logo_dir + file) is None:
+            file_name = SpecialEventConstants.event_logo_dir + file
+            if ClickUtils.get_img_location(file_name) is None:
                 continue
 
             # 获取位置并点击
             event_logo_loc = None
             while event_logo_loc is None:
-                event_logo_loc = ClickUtils.get_img_location(SpecialEventConstants.event_logo_dir + file)
+                event_logo_loc = ClickUtils.get_img_location(file_name)
                 time.sleep(1)
 
             print("获取到event位置，点击event")
-            ClickUtils.click_by_pos(event_logo_loc.x, event_logo_loc.y + 20)
-            CommonUtils.click_retry()
+            while ClickUtils.get_img_location(CommonConstants.dialog_mark_img) is None and \
+                    ClickUtils.get_img_location(file_name) is not None:
+                # 检查是否直接出现了【好】按钮
+                hao_loc = DuelUtils.get_hao_loc()
+                if hao_loc is not None:
+                    print("检测到【好】按钮，点击并完成事件")
+                    ClickUtils.click_by_location(hao_loc)
+                    time.sleep(2)
+                    self.runtime_context.duel_success_flag = False
+                    return
+
+                ClickUtils.click_by_pos(event_logo_loc.x, event_logo_loc.y + 20)
+                CommonUtils.click_retry()
 
             # 点击对话框直到出现决斗按钮
             duel_logo_loc = None
             while duel_logo_loc is None:
+                # 检查是否直接出现了【好】按钮
+                hao_loc = DuelUtils.get_hao_loc()
+                if hao_loc is not None:
+                    print("检测到【好】按钮，点击并完成事件")
+                    ClickUtils.click_by_location(hao_loc)
+                    time.sleep(2)
+                    self.runtime_context.duel_success_flag = False
+                    return
+
                 # 点击对话框
                 time.sleep(1)
                 print("点击对话框直到出现等级标签")
@@ -79,14 +100,24 @@ class SpecialEventDuel(BaseDuel):
                     ClickUtils.click_by_location(event_level_loc)
                     time.sleep(1)
 
-            # 点击决斗
-            if duel_logo_loc is not None:
-                print("点击决斗")
-                ClickUtils.click_by_location(duel_logo_loc)
-                time.sleep(1)
+            # 获取所有可能的决斗按钮位置并依次点击
+            duel_logo_locs = DuelUtils.get_all_duel_logo_locs()
+            entered = False
+            for loc in duel_logo_locs:
+                print(f"尝试点击决斗标签位置: {loc}")
+                ClickUtils.click_by_location(loc)
+                time.sleep(2)
+                CommonUtils.click_retry()
+                # 点击后检查决斗标签是否消失
+                if DuelUtils.get_duel_logo_loc() is None:
+                    self.runtime_context.duel_loc = loc
+                    entered = True
+                    print("成功进入决斗")
+                    break
 
+            if not entered:
+                print("未能进入决斗")
+                self.runtime_context.duel_success_flag = False
+                return
 
-
-
-
-
+            self.runtime_context.duel_success_flag = True

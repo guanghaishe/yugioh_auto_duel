@@ -25,9 +25,30 @@ def get_duel_logo_loc():
         duel_logo_list.sort()
 
     for filename in duel_logo_list:
-        if ClickUtils.get_img_location(DuelConstants.duel_logo_dir + filename):
-            return ClickUtils.get_img_location(DuelConstants.duel_logo_dir + filename)
+        loc = ClickUtils.get_img_location(DuelConstants.duel_logo_dir + filename)
+        if loc:
+            return loc
     return None
+
+
+def get_all_duel_logo_locs():
+    """
+    获取当前屏幕上所有匹配的决斗图标位置
+    :return: 决斗图标位置列表
+    """
+    global duel_logo_list
+    if not duel_logo_list or len(duel_logo_list) == 0:
+        for filename in os.listdir(DuelConstants.duel_logo_dir):
+            duel_logo_list.append(filename)
+        duel_logo_list.sort()
+
+    locs = []
+    for filename in duel_logo_list:
+        loc = ClickUtils.get_img_location(DuelConstants.duel_logo_dir + filename)
+        if loc:
+            locs.append(loc)
+    return locs
+
 
 def get_event_level_loc():
     if ClickUtils.get_img_location(SpecialEventConstants.level_60_img, 0.9) is not None:

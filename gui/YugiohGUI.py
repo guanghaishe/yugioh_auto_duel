@@ -35,7 +35,7 @@ class YugiohGUI:
 
         # 设置窗口大小和居中显示
         window_width = 600
-        window_height = 500
+        window_height = 700
         screen_width = self.master.winfo_screenwidth()
         screen_height = self.master.winfo_screenheight()
 
@@ -46,6 +46,7 @@ class YugiohGUI:
 
         # 决斗相关变量
         self.duel_type = tk.StringVar()
+        self.duel_times = tk.StringVar(value="1000")  # 默认运行1000次
         self.config = config
         self.runtime_context = runtime_context
 
@@ -79,8 +80,15 @@ class YugiohGUI:
             row = i // 3
             col = i % 3
             tk.Radiobutton(options_frame, text=text, variable=self.duel_type, value=value).grid(row=row, column=col, sticky="w", padx=10)
-        
+
         self.duel_type.set("passer_duel")
+
+        # 次数设置区域
+        times_frame = tk.LabelFrame(self.master, text="运行次数设置", padx=10, pady=10)
+        times_frame.pack(fill="x", padx=10, pady=5)
+
+        tk.Label(times_frame, text="运行次数:").pack(side="left", padx=5)
+        tk.Entry(times_frame, textvariable=self.duel_times, width=10).pack(side="left", padx=5)
 
         # 按钮区域
         button_frame = tk.Frame(self.master)
@@ -104,9 +112,19 @@ class YugiohGUI:
             messagebox.showinfo("警告", "功能正在运行中")
             return
 
+        # 验证运行次数输入
+        try:
+            duel_times = int(self.duel_times.get())
+            if duel_times <= 0:
+                messagebox.showerror("错误", "运行次数必须大于0")
+                return
+        except ValueError:
+            messagebox.showerror("错误", "运行次数必须是整数")
+            return
+
         self.stop_flag = False
         duel_type = self.duel_type.get()
-        
+
         # 获取功能名称用于显示
         func_name = ""
         for text, val in [
@@ -123,8 +141,8 @@ class YugiohGUI:
                 func_name = text
                 break
 
-        print(f"--- {func_name} 功能启动 ---")
-        
+        print(f"--- {func_name} 功能启动 (共运行 {duel_times} 次) ---")
+
         target_func = None
         if duel_type == "passer_duel":
             target_func = self.worker_passer_duel
@@ -144,67 +162,83 @@ class YugiohGUI:
             target_func = self.worker_reward_extract
 
         if target_func:
-            self.duel_thread = threading.Thread(target=target_func, args=(func_name,))
+            self.duel_thread = threading.Thread(target=target_func, args=(func_name, duel_times))
             self.duel_thread.daemon = True
             self.duel_thread.start()
 
-    def worker_passer_duel(self, name):
+    def worker_passer_duel(self, name, duel_times):
         passer_duel = PasserDuelV2(self.config, self.runtime_context)
-        for i in range(1000):
+        for i in range(duel_times):
             if self.stop_flag: break
-            print(f"开始第 {i+1} 次路人清理")
+            print(f"准备运行第 {i+1} 次 {name}")
             passer_duel.run()
-            print(f"第 {i+1} 次路人清理结束")
+            print(f"第 {i+1} 次 {name} 结束")
             for _ in range(120): # sleep 120s but check stop_flag
                 if self.stop_flag: break
                 time.sleep(1)
         print(f"--- {name} 已停止 ---")
 
-    def worker_portal_duel(self, name):
+    def worker_portal_duel(self, name, duel_times):
         portal_duel = PortalDuel(self.config, self.runtime_context)
-        for i in range(1000):
+        for i in range(duel_times):
             if self.stop_flag: break
+            print(f"准备运行第 {i+1} 次 {name}")
             portal_duel.duel()
+            print(f"第 {i+1} 次 {name} 结束")
         print(f"--- {name} 已停止 ---")
 
-    def worker_duelist_kingdom(self, name):
+    def worker_duelist_kingdom(self, name, duel_times):
         duelist_kingdom_duel = DuelistKingdomDuel(self.config, self.runtime_context)
-        for i in range(1000):
+        for i in range(duel_times):
             if self.stop_flag: break
+            print(f"准备运行第 {i+1} 次 {name}")
             duelist_kingdom_duel.duel()
+            print(f"第 {i+1} 次 {name} 结束")
         print(f"--- {name} 已停止 ---")
 
-    def worker_skill_get(self, name):
-        SkillUtils.get_skill()
+    def worker_skill_get(self, name, duel_times):
+        for i in range(duel_times):
+            if self.stop_flag: break
+            print(f"准备运行第 {i+1} 次 {name}")
+            SkillUtils.get_skill()
+            print(f"第 {i+1} 次 {name} 结束")
         print(f"--- {name} 已停止 ---")
 
-    def worker_rescue_duel(self, name):
+    def worker_rescue_duel(self, name, duel_times):
         rescue_duel = RescueDuel(self.config, self.runtime_context)
-        for i in range(1000):
+        for i in range(duel_times):
             if self.stop_flag: break
+            print(f"准备运行第 {i+1} 次 {name}")
             rescue_duel.work()
+            print(f"第 {i+1} 次 {name} 结束")
         print(f"--- {name} 已停止 ---")
 
-    def worker_wave_duel(self, name):
+    def worker_wave_duel(self, name, duel_times):
         wave_duel = WaveDuel(self.config, self.runtime_context)
-        for i in range(1000):
+        for i in range(duel_times):
             if self.stop_flag: break
+            print(f"准备运行第 {i+1} 次 {name}")
             wave_duel.duel()
+            print(f"第 {i+1} 次 {name} 结束")
         print(f"--- {name} 已停止 ---")
 
-    def worker_tag_duel(self, name):
+    def worker_tag_duel(self, name, duel_times):
         tag_duel = TagDuelTournamentDuel(self.config, self.runtime_context)
-        for i in range(1000):
+        for i in range(duel_times):
             if self.stop_flag: break
+            print(f"准备运行第 {i+1} 次 {name}")
             tag_duel.duel()
+            print(f"第 {i+1} 次 {name} 结束")
             time.sleep(3)
         print(f"--- {name} 已停止 ---")
 
-    def worker_reward_extract(self, name):
+    def worker_reward_extract(self, name, duel_times):
         reward_extract = RewardExtract(self.config, self.runtime_context)
-        for i in range(1000):
+        for i in range(duel_times):
             if self.stop_flag: break
+            print(f"准备运行第 {i+1} 次 {name}")
             reward_extract.extractLotteryReward()
+            print(f"第 {i+1} 次 {name} 结束")
             time.sleep(0.5)
         print(f"--- {name} 已停止 ---")
 

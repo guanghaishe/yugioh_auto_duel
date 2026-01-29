@@ -1,4 +1,4 @@
 [Settings]
-if_special_event_duel=false
-portal_duel_return_world_idx = 5
+if_special_event_duel=true
+portal_duel_return_world_idx = 1
 special_event_duel_return_world_idx = 1
