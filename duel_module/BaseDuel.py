@@ -56,7 +56,11 @@ class BaseDuel:
 
             time.sleep(2)
             print("点击对话框直到出现决斗标签")
-            ClickUtils.click_by_img(CommonConstants.dialog_mark_img)
+            if ClickUtils.get_img_location(CommonConstants.dialog_fast_forward_img) is not None:
+                print("点击对话框快进图标")
+                ClickUtils.click_by_img(CommonConstants.dialog_fast_forward_img)
+            else:
+                ClickUtils.click_by_img(CommonConstants.dialog_mark_img)
             CommonUtils.click_retry()
             time.sleep(2)
             if ClickUtils.get_img_location(CommonConstants.cancel_img) is not None:
@@ -107,6 +111,8 @@ class BaseDuel:
 
     # 决斗结束后
     def after_duel(self):
+        self.runtime_context.duel_loc = None
+
         if self.runtime_context.duel_success_flag is False:
             return
 
@@ -149,12 +155,17 @@ class BaseDuel:
         # 2. 循环点击对话框直到对话框消失
         while ClickUtils.get_img_location(CommonConstants.dialog_mark_img) is not None:
             print("活动结束后点击对话框")
-            ClickUtils.click_by_img(CommonConstants.dialog_mark_img)
+            if ClickUtils.get_img_location(CommonConstants.dialog_fast_forward_img) is not None:
+                print("点击对话框快进图标")
+                ClickUtils.click_by_img(CommonConstants.dialog_fast_forward_img)
+            else:
+                ClickUtils.click_by_img(CommonConstants.dialog_mark_img)
             CommonUtils.click_retry()
             time.sleep(1)
 
         if self.config.if_special_event_duel is True and EventUtils.if_exist_activity():
             self.runtime_context.special_event_file_name = EventUtils.get_activity_file_name()
+            return
 
         # 3. 决斗结束后点击取消、关闭、后退
         while ClickUtils.get_img_location(CommonConstants.cancel_img) is not None \
@@ -177,12 +188,12 @@ class BaseDuel:
                 continue
             time.sleep(1)
 
-        print("决斗流程结束")
-        self.runtime_context.duel_loc = None
 
 
     def prepare(self):
         pass
 
     def finish(self):
+        print("决斗流程结束")
         self.runtime_context.duel_success_flag = True
+        self.runtime_context.duel_loc = None

@@ -172,7 +172,7 @@ class YugiohGUI:
             if self.stop_flag: break
             print(f"准备运行第 {i+1} 次 {name}")
             passer_duel.run()
-            print(f"第 {i+1} 次 {name} 结束")
+            print(f"第 {i+1} 次 {name} 结束, 时间: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}")
             for _ in range(120): # sleep 120s but check stop_flag
                 if self.stop_flag: break
                 time.sleep(1)

@@ -16,6 +16,12 @@ class RescueDuel(BaseDuel):
 
     def prepare(self):
 
+        print("进入了救援决斗准备阶段")
+
+        print("1. 检测图片: ", SpecialEventConstants.special_event_logo_dir + self.runtime_context.special_event_file_name)
+        loc = ClickUtils.get_img_location(SpecialEventConstants.special_event_logo_dir + self.runtime_context.special_event_file_name)
+        print("图片位置: ", loc)
+
         while ClickUtils.get_img_location(SpecialEventConstants.special_event_logo_dir + self.runtime_context.special_event_file_name) is not None:
             ClickUtils.click_by_img(SpecialEventConstants.special_event_logo_dir + self.runtime_context.special_event_file_name)
             if ClickUtils.get_img_location(CommonConstants.close_button_img) is not None:
@@ -69,6 +75,7 @@ class RescueDuel(BaseDuel):
 def prepare_clear_copy(self):
     ClickUtils.click_by_img_if_exist(RescueDuelConstants.appear_immediately_img)
     ClickUtils.click_by_img(CommonConstants.close_button_img, 0, -90)
+    ClickUtils.click_by_img_if_exist(SpecialEventConstants.goto_activity_img)
     ClickUtils.click_by_img_if_exist(RescueDuelConstants.appeared_img)
     time.sleep(2)
 

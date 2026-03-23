@@ -15,4 +15,5 @@ level_60_img = CommonUtils.build_img_path('level_60', special_event_logo_duel_di
 partner_img = CommonUtils.build_img_path('partner', special_event_logo_duel_dir)
 select_role_and_deck_img = CommonUtils.build_img_path('selectRoleAndDeck', special_event_logo_duel_dir)
 appear_img = CommonUtils.build_img_path('appear', special_event_logo_dir)
+goto_activity_img = CommonUtils.build_img_path('goto_activity', special_event_logo_dir)
 

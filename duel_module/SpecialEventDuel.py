@@ -22,6 +22,13 @@ class SpecialEventDuel(BaseDuel):
 
 
     def before_duel(self):
+        # 如果有前往活动页面，先点击前往活动页面
+        if ClickUtils.get_img_location(SpecialEventConstants.goto_activity_img) is not None:
+            print("检测到前往活动页面，点击")
+            ClickUtils.click_by_img(SpecialEventConstants.goto_activity_img)
+            time.sleep(2)
+            CommonUtils.click_retry()
+
         # 如果还有出现图标，继续点击
         while ClickUtils.get_img_location(SpecialEventConstants.appear_img) is not None:
             ClickUtils.click_by_img(SpecialEventConstants.appear_img)
@@ -51,6 +58,15 @@ class SpecialEventDuel(BaseDuel):
                     self.runtime_context.duel_success_flag = False
                     return
 
+                # 检查是否直接出现了【关闭】按钮
+                close_loc = ClickUtils.get_img_location(CommonConstants.close_button_img)
+                if close_loc is not None:
+                    print("检测到【关闭】按钮，点击并完成事件")
+                    ClickUtils.click_by_location(close_loc)
+                    time.sleep(2)
+                    self.runtime_context.duel_success_flag = False
+                    return
+
                 ClickUtils.click_by_pos(event_logo_loc.x, event_logo_loc.y + 20)
                 CommonUtils.click_retry()
 
@@ -66,10 +82,23 @@ class SpecialEventDuel(BaseDuel):
                     self.runtime_context.duel_success_flag = False
                     return
 
+                # 检查是否直接出现了【关闭】按钮
+                close_loc = ClickUtils.get_img_location(CommonConstants.close_button_img)
+                if close_loc is not None:
+                    print("检测到【关闭】按钮，点击并完成事件")
+                    ClickUtils.click_by_location(close_loc)
+                    time.sleep(2)
+                    self.runtime_context.duel_success_flag = False
+                    return
+
                 # 点击对话框
                 time.sleep(1)
                 print("点击对话框直到出现等级标签")
-                ClickUtils.click_by_img(CommonConstants.dialog_mark_img)
+                if ClickUtils.get_img_location(CommonConstants.dialog_fast_forward_img) is not None:
+                    print("点击对话框快进图标")
+                    ClickUtils.click_by_img(CommonConstants.dialog_fast_forward_img)
+                else:
+                    ClickUtils.click_by_img(CommonConstants.dialog_mark_img)
                 CommonUtils.click_retry()
                 time.sleep(1)
 

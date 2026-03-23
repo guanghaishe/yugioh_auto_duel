@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(git -C \"d:/1_work/120_DevProjects/python workspace/yugioh_auto_duel/yugioh_auto_duel/.claude/worktrees/agent-ae87decb\" log --oneline --diff-filter=R -- \"img/guojifu/event/special event logos/*\")",
+      "Bash(git -C \"d:/1_work/120_DevProjects/python workspace/yugioh_auto_duel/yugioh_auto_duel/.claude/worktrees/agent-ae87decb\" status --short -- \"img/guojifu/event/special event logos/\")",
+      "Bash(git -C \"d:/1_work/120_DevProjects/python workspace/yugioh_auto_duel/yugioh_auto_duel/.claude/worktrees/agent-ae87decb\" status)"
     ]
   }
 }
